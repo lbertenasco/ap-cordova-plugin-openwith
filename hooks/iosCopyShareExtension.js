@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 DavidStrausz
+// Copyright (c)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 
 var fs = require('fs');
 var path = require('path');
-const PLUGIN_ID = "cc.fovea.cordova.openwith";
+const PLUGIN_ID = "com.agorapulsetest.cordova.openwith";
 
 function redError(message) {
     return new Error('"' + PLUGIN_ID + '" \x1b[1m\x1b[31m' + message + '\x1b[0m');

@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 DavidStrausz
+// Copyright (c)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 // THE SOFTWARE.
 //
 
-const PLUGIN_ID = 'cc.fovea.cordova.openwith';
+const PLUGIN_ID = 'com.agorapulsetest.cordova.openwith';
 const BUNDLE_SUFFIX = '.shareextension';
 
 var fs = require('fs');
@@ -241,15 +241,15 @@ module.exports = function (context) {
     });
 
     // Find if the project already contains the target and group
-    var target = pbxProject.pbxTargetByName('ShareExt');
+    var target = pbxProject.pbxTargetByName('ApShareExt');
     if (target) {
-      console.log('    ShareExt target already exists.');
+      console.log('    ApShareExt target already exists.');
     }
 
     if (!target) {
       // Add PBXNativeTarget to the project
-      target = pbxProject.addTarget('ShareExt', 'app_extension', 'ShareExtension');
-      
+      target = pbxProject.addTarget('ApShareExt', 'app_extension', 'ShareExtension');
+
       // Add a new PBXSourcesBuildPhase for our ShareViewController
       // (we can't add it to the existing one because an extension is kind of an extra app)
       pbxProject.addBuildPhase([], 'PBXSourcesBuildPhase', 'Sources', target.uuid);
@@ -298,7 +298,7 @@ module.exports = function (context) {
           var buildSettingsObj = configurations[key].buildSettings;
           if (typeof buildSettingsObj['PRODUCT_NAME'] !== 'undefined') {
             var productName = buildSettingsObj['PRODUCT_NAME'];
-            if (productName.indexOf('ShareExt') >= 0) {
+            if (productName.indexOf('ApShareExt') >= 0) {
               buildSettingsObj['PROVISIONING_PROFILE'] = PROVISIONING_PROFILE;
               buildSettingsObj['DEVELOPMENT_TEAM'] = DEVELOPMENT_TEAM;
               console.log('Added signing identities for extension!');

@@ -1,4 +1,4 @@
-package cc.fovea.openwith;
+package com.agorapulsetest.openwith;
 
 import android.content.ContentResolver;
 import android.content.Intent;

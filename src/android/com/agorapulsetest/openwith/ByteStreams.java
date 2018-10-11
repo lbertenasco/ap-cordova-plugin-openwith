@@ -1,4 +1,4 @@
-package cc.fovea.openwith;
+package com.agorapulsetest.openwith;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

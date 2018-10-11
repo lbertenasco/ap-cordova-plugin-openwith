@@ -1,6 +1,4 @@
-# cordova-plugin-openwith
-
-<a href="https://fovea.cc"><img alt="Logo Fovea" src="https://fovea.cc/blog/wp-content/uploads/2017/09/fovea-logo-flat-128.png" height="50" /></a> &amp; <a href="https://www.interactivetools.com"><img alt="Logo InteractiveTools" src="https://www.interactivetools.com/assets/images/header/logo.png" height="59" /></a>
+# ap-cordova-plugin-openwith
 
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
@@ -21,7 +19,7 @@ You'd like your app to be listed in the **Send to...** section for certain types
 
 ## Background
 
-iOS and Android each have their own ways of handing over files to an app. This plugin abstracts them behind a single and simplified interface. It does not expose all subtleties of each system, be this should be enough for 99% of people. Are you the 1% that needs more? Fork and PR if it makes sense, or [ask for help](mailto://contact@fovea.cc).
+iOS and Android each have their own ways of handing over files to an app. This plugin abstracts them behind a single and simplified interface. It does not expose all subtleties of each system, be this should be enough for 99% of people. Are you the 1% that needs more? Fork and PR if it makes sense.
 
 The plugin's API mostly follows Android's terminology.
 
@@ -54,9 +52,10 @@ On the Cordova App side, the plugin checks listens for app start or resume event
 Here's the promised one liner:
 
 ```
-cordova plugin add cc.fovea.cordova.openwith \
+cordova plugin add com.agorapulsetest.cordova.openwith \
   --variable ANDROID_MIME_TYPE="image/*" \
-  --variable IOS_URL_SCHEME=ccfoveaopenwithdemo \
+  --variable IOS_URL_SCHEME=agorapulsetest \
+  --variable IOS_GROUP_IDENTIFIER=group.com.agorapulsetest.app.shareextension \
   --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.image
 ```
 
@@ -100,7 +99,7 @@ Use the `ANDROID_EXTRA_ACTIONS` to accept additional actions. The variable shoul
 
 ```
 MY_EXTRA_ACTIONS='<action android:name="android.intent.action.VIEW" />'
-cordova plugin add cc.fovea.cordova.openwith \
+cordova plugin add com.agorapulsetest.cordova.openwith \
   --variable ANDROID_MIME_TYPE="image/*" \
   --variable "ANDROID_EXTRA_ACTIONS=$MY_EXTRA_ACTIONS"
 ```
@@ -260,4 +259,4 @@ Contributions in the form of GitHub pull requests are welcome. Please adhere to 
 
 ## License
 
-[MIT](./LICENSE) © Fovea.cc
+[MIT](./LICENSE) ©
