@@ -25,7 +25,7 @@ SOFTWARE.
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.agorapulsetest.cordova.openwith"
+    id="com.agorapulse.cordova.openwith"
     version="1.0.0">
 
     <name>OpenWith</name>
@@ -65,7 +65,7 @@ SOFTWARE.
             <array>
                 <dict>
                     <key>CFBundleURLName</key>
-                    <string>com.agorapulsetest.openwith.$IOS_URL_SCHEME.shareextension</string>
+                    <string>com.agorapulse.openwith.$IOS_URL_SCHEME.shareextension</string>
                     <key>CFBundleURLSchemes</key>
                     <array>
                         <string>$IOS_URL_SCHEME</string>
@@ -108,16 +108,16 @@ SOFTWARE.
         <!-- Cordova >= 3.0.0 -->
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="OpenWithPlugin">
-				<param name="android-package" value="com.agorapulsetest.openwith.OpenWithPlugin"/>
+				<param name="android-package" value="com.agorapulse.openwith.OpenWithPlugin"/>
 			</feature>
             <preference name="AndroidLaunchMode" value="singleTask"/>
         </config-file>
 
         <!-- cordova plugin src files -->
-        <source-file src="src/android/com/agorapulsetest/openwith/OpenWithPlugin.java" target-dir="src/com/agorapulsetest/openwith" />
-        <source-file src="src/android/com/agorapulsetest/openwith/PluginResultSender.java" target-dir="src/com/agorapulsetest/openwith" />
-        <source-file src="src/android/com/agorapulsetest/openwith/Serializer.java" target-dir="src/com/agorapulsetest/openwith" />
-        <source-file src="src/android/com/agorapulsetest/openwith/ByteStreams.java" target-dir="src/com/agorapulsetest/openwith" />
+        <source-file src="src/android/com/agorapulse/openwith/OpenWithPlugin.java" target-dir="src/com/agorapulse/openwith" />
+        <source-file src="src/android/com/agorapulse/openwith/PluginResultSender.java" target-dir="src/com/agorapulse/openwith" />
+        <source-file src="src/android/com/agorapulse/openwith/Serializer.java" target-dir="src/com/agorapulse/openwith" />
+        <source-file src="src/android/com/agorapulse/openwith/ByteStreams.java" target-dir="src/com/agorapulse/openwith" />
     </platform>
 
 <!--

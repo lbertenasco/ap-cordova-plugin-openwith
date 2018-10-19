@@ -29,7 +29,7 @@
 // THE SOFTWARE.
 //
 
-const PLUGIN_ID = 'com.agorapulsetest.cordova.openwith';
+const PLUGIN_ID = 'com.agorapulse.cordova.openwith';
 const BUNDLE_SUFFIX = '.shareextension';
 
 var fs = require('fs');

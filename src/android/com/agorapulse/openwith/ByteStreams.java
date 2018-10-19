@@ -1,4 +1,4 @@
-package com.agorapulsetest.openwith;
+package com.agorapulse.openwith;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

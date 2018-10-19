@@ -1,4 +1,4 @@
-package com.agorapulsetest.openwith;
+package com.agorapulse.openwith;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;

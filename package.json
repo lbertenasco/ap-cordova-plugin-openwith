@@ -1,9 +1,9 @@
 {
-  "name": "com.agorapulsetest.cordova.openwith",
-  "version": "1.3.1",
+  "name": "com.agorapulse.cordova.openwith",
+  "version": "1.3.6",
   "description": "Cordova \"Open With\" plugin for iOS and Android",
   "cordova": {
-    "id": "com.agorapulsetest.cordova.openwith",
+    "id": "com.agorapulse.cordova.openwith",
     "platforms": [
       "android",
       "ios"
@@ -61,10 +61,10 @@
   },
   "# White list the files to pack by npm publish": "",
   "files": [
-    "src/android/com/agorapulsetest/openwith/ByteStreams.java",
-    "src/android/com/agorapulsetest/openwith/OpenWithPlugin.java",
-    "src/android/com/agorapulsetest/openwith/PluginResultSender.java",
-    "src/android/com/agorapulsetest/openwith/Serializer.java",
+    "src/android/com/agorapulse/openwith/ByteStreams.java",
+    "src/android/com/agorapulse/openwith/OpenWithPlugin.java",
+    "src/android/com/agorapulse/openwith/PluginResultSender.java",
+    "src/android/com/agorapulse/openwith/Serializer.java",
     "src/ios/OpenWithPlugin.m",
     "src/ios/ShareExtension/ShareExtension-Info.plist",
     "src/ios/ShareExtension/ShareViewController.h",

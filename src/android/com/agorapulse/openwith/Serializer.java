@@ -1,4 +1,4 @@
-package com.agorapulsetest.openwith;
+package com.agorapulse.openwith;
 
 import android.content.ClipData;
 import android.content.ContentResolver;

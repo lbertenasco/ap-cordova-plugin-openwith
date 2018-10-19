@@ -1,4 +1,4 @@
-package com.agorapulsetest.openwith;
+package com.agorapulse.openwith;
 
 import android.content.ContentResolver;
 import android.content.Intent;

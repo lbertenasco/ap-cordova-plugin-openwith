@@ -212,56 +212,136 @@ static NSDictionary* launchOptions = nil;
     }
 
     [self.userDefaults synchronize];
-    NSObject *object = [self.userDefaults objectForKey:@"image"];
-    if (object == nil) {
+
+    NSObject *image = [self.userDefaults objectForKey:@"image"];
+    NSObject *url = [self.userDefaults objectForKey:@"url"];
+    NSObject *text = [self.userDefaults objectForKey:@"text"];
+
+    if (image != nil) {
+        // Clean-up the object, assume it's been handled from now, prevent double processing
+        [self.userDefaults removeObjectForKey:@"image"];
+
+        // Extract sharing data, make sure that it is valid
+        if (![image isKindOfClass:[NSDictionary class]]) {
+            [self debug:@"[checkForFileToShare] Data object is invalid"];
+            return;
+        }
+        NSDictionary *dict = (NSDictionary*)image;
+        NSData *data = dict[@"data"];
+        NSString *name = dict[@"name"];
+        self.backURL = dict[@"backURL"];
+        NSString *type = [self mimeTypeFromUti:dict[@"uti"]];
+        if (![data isKindOfClass:NSData.class]) {
+            [self debug:@"[checkForFileToShare] Data content is invalid"];
+            return;
+        }
+        NSArray *utis = dict[@"utis"];
+        if (utis == nil) {
+            utis = @[];
+        }
+
+        // TODO: add the backURL to the shared intent, put it aside in the plugin
+        // TODO: implement cordova.openwith.exit(intent), will check if backURL is set
+
+        // Send to javascript
+        [self debug:[NSString stringWithFormat:
+                     @"[checkForFileToShare] Sharing a %lu bytes image", (unsigned long)data.length]];
+
+        NSString *uri = [NSString stringWithFormat: @"shareextension://index=0,name=%@,type=%@",
+                         name, type];
+        NSLog(@"ACA %@", data);
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{
+            @"action": @"SEND",
+            @"exit": @YES,
+            @"items": @[@{
+                @"base64": [data convertToBase64],
+                @"type": type,
+                @"utis": utis,
+                @"uri": uri,
+                @"name": name
+                }]
+            }];
+        pluginResult.keepCallback = [NSNumber numberWithBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.handlerCallback];
+    } else if (url != nil) {
+        [self.userDefaults removeObjectForKey:@"url"];
+        if (![url isKindOfClass:[NSDictionary class]]) {
+            [self debug:@"[checkForFileToShare] Data object is invalid"];
+            return;
+        }
+        NSDictionary *dict = (NSDictionary*)url;
+        NSData *data = dict[@"data"];
+        NSString *name = dict[@"name"];
+        self.backURL = dict[@"backURL"];
+        NSString *type = [self mimeTypeFromUti:dict[@"uti"]];
+        if (![data isKindOfClass:NSString.class]) {
+            [self debug:@"[checkForFileToShare] Data content is invalid"];
+            return;
+        }
+        NSArray *utis = dict[@"utis"];
+        if (utis == nil) {
+            utis = @[];
+        }
+
+        [self debug:[NSString stringWithFormat:
+                     @"[checkForFileToShare] Sharing a %lu bytes image", (unsigned long)data.length]];
+
+        NSString *uri = [NSString stringWithFormat: @"shareextension://index=0,name=%@,type=%@", name, type];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{
+            @"action": @"SEND",
+            @"exit": @YES,
+            @"items": @[@{
+                @"url": data,
+                @"type": type,
+                @"utis": utis,
+                @"uri": uri,
+                @"name": name
+                }]
+        }];
+        pluginResult.keepCallback = [NSNumber numberWithBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.handlerCallback];
+    } else if (text != nil) {
+        [self.userDefaults removeObjectForKey:@"text"];
+        if (![text isKindOfClass:[NSDictionary class]]) {
+            [self debug:@"[checkForFileToShare] Data object is invalid"];
+            return;
+        }
+        NSDictionary *dict = (NSDictionary*)text;
+        NSData *data = dict[@"data"];
+        NSString *name = dict[@"name"];
+        self.backURL = dict[@"backURL"];
+        NSString *type = [self mimeTypeFromUti:dict[@"uti"]];
+        if (![data isKindOfClass:NSString.class]) {
+            [self debug:@"[checkForFileToShare] Data content is invalid"];
+            return;
+        }
+        NSArray *utis = dict[@"utis"];
+        if (utis == nil) {
+            utis = @[];
+        }
+
+        [self debug:[NSString stringWithFormat:
+                     @"[checkForFileToShare] Sharing a %lu bytes image", (unsigned long)data.length]];
+
+        NSString *uri = [NSString stringWithFormat: @"shareextension://index=0,name=%@,type=%@", name, type];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{
+            @"action": @"SEND",
+            @"exit": @YES,
+            @"items": @[@{
+                @"text": data,
+                @"type": type,
+                @"utis": utis,
+                @"uri": uri,
+                @"name": name
+            }]
+        }];
+        pluginResult.keepCallback = [NSNumber numberWithBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.handlerCallback];
+    } else {
         [self debug:@"[checkForFileToShare] Nothing to share"];
         return;
     }
 
-    // Clean-up the object, assume it's been handled from now, prevent double processing
-    [self.userDefaults removeObjectForKey:@"image"];
-
-    // Extract sharing data, make sure that it is valid
-    if (![object isKindOfClass:[NSDictionary class]]) {
-        [self debug:@"[checkForFileToShare] Data object is invalid"];
-        return;
-    }
-    NSDictionary *dict = (NSDictionary*)object;
-    NSData *data = dict[@"data"];
-    NSString *name = dict[@"name"];
-    self.backURL = dict[@"backURL"];
-    NSString *type = [self mimeTypeFromUti:dict[@"uti"]];
-    if (![data isKindOfClass:NSData.class]) {
-        [self debug:@"[checkForFileToShare] Data content is invalid"];
-        return;
-    }
-    NSArray *utis = dict[@"utis"];
-    if (utis == nil) {
-        utis = @[];
-    }
-
-    // TODO: add the backURL to the shared intent, put it aside in the plugin
-    // TODO: implement cordova.openwith.exit(intent), will check if backURL is set
-
-    // Send to javascript
-    [self debug:[NSString stringWithFormat:
-        @"[checkForFileToShare] Sharing a %lu bytes image", (unsigned long)data.length]];
-
-    NSString *uri = [NSString stringWithFormat: @"shareextension://index=0,name=%@,type=%@",
-        name, type];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{
-        @"action": @"SEND",
-        @"exit": @YES,
-        @"items": @[@{
-            @"base64": [data convertToBase64],
-            @"type": type,
-            @"utis": utis,
-            @"uri": uri,
-            @"name": name
-        }]
-    }];
-    pluginResult.keepCallback = [NSNumber numberWithBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.handlerCallback];
 }
 
 // Initialize the plugin

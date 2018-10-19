@@ -28,3 +28,4 @@
 #define SHAREEXT_GROUP_IDENTIFIER @"__GROUP_IDENTIFIER__"
 #define SHAREEXT_URL_SCHEME @"__URL_SCHEME__"
 #define SHAREEXT_UNIFORM_TYPE_IDENTIFIER @"__UNIFORM_TYPE_IDENTIFIER__"
+#define SHAREEXT_UNIFORM_TYPE_ENABLED_IDENTIFIERS [NSArray arrayWithObjects:@"public.image",@"public.url",@"public.plain-text",nil]
