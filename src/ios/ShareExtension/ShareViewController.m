@@ -111,6 +111,25 @@
     }
 }
 
+- (void)setParameters:(NSString *)fileIdentifier itemProvider:(NSItemProvider *)itemProvider suggestedName:(NSString **)suggestedName uti:(NSString **)uti utis:(NSArray<NSString *> **)utis {
+    [self.extensionContext completeRequestReturningItems:@[]
+                                       completionHandler:nil];
+    *suggestedName = @"";
+    if ([itemProvider respondsToSelector:NSSelectorFromString(@"getSuggestedName")]) {
+        *suggestedName = [itemProvider valueForKey:@"suggestedName"];
+    }
+
+    *uti = @"";
+    *utis = [NSArray new];
+    if ([itemProvider.registeredTypeIdentifiers count] > 0) {
+        *uti = itemProvider.registeredTypeIdentifiers[0];
+        *utis = itemProvider.registeredTypeIdentifiers;
+    }
+    else {
+        *uti = fileIdentifier;
+    }
+}
+
 - (void) submit {
 
     [self setup];
@@ -119,69 +138,148 @@
     // This is called after the user selects Post. Do the upload of contentText and/or NSExtensionContext attachments.
     for (NSItemProvider* itemProvider in ((NSExtensionItem*)self.extensionContext.inputItems[0]).attachments) {
 
-        if ([itemProvider hasItemConformingToTypeIdentifier:SHAREEXT_UNIFORM_TYPE_IDENTIFIER]) {
-            [self debug:[NSString stringWithFormat:@"item provider = %@", itemProvider]];
+        NSString *fileIdentifier;
+        for (NSString* identifier in SHAREEXT_UNIFORM_TYPE_ENABLED_IDENTIFIERS) {
+            if ([itemProvider hasItemConformingToTypeIdentifier:identifier]) {
+                fileIdentifier = identifier;
+            }
+        }
 
-            [itemProvider loadItemForTypeIdentifier:SHAREEXT_UNIFORM_TYPE_IDENTIFIER options:nil completionHandler: ^(id<NSSecureCoding> item, NSError *error) {
+        if ([fileIdentifier isEqualToString: @"public.image"]) {
 
-                NSData *data = [[NSData alloc] init];
-                if([(NSObject*)item isKindOfClass:[NSURL class]]) {
-                    data = [NSData dataWithContentsOfURL:(NSURL*)item];
-                }
-                if([(NSObject*)item isKindOfClass:[UIImage class]]) {
-                    data = UIImagePNGRepresentation((UIImage*)item);
-                }
+            NSExtensionItem *item = self.extensionContext.inputItems.firstObject;
+            NSItemProvider *itemProvider = item.attachments.firstObject;
 
-                NSString *suggestedName = @"";
-                if ([itemProvider respondsToSelector:NSSelectorFromString(@"getSuggestedName")]) {
-                    suggestedName = [itemProvider valueForKey:@"suggestedName"];
-                }
+            if ([itemProvider hasItemConformingToTypeIdentifier:fileIdentifier]) {
+                [itemProvider loadItemForTypeIdentifier:fileIdentifier options:nil completionHandler:^(id<NSSecureCoding> item, NSError *error) {
 
-                NSString *uti = @"";
-                NSArray<NSString *> *utis = [NSArray new];
-                if ([itemProvider.registeredTypeIdentifiers count] > 0) {
-                    uti = itemProvider.registeredTypeIdentifiers[0];
-                    utis = itemProvider.registeredTypeIdentifiers;
-                }
-                else {
-                    uti = SHAREEXT_UNIFORM_TYPE_IDENTIFIER;
-                }
-                NSDictionary *dict = @{
-                    @"backURL": self.backURL,
-                    @"data" : data,
-                    @"uti": uti,
-                    @"utis": utis,
-                    @"name": suggestedName
-                };
-                [self.userDefaults setObject:dict forKey:@"image"];
-                [self.userDefaults synchronize];
+                    NSData *data = [[NSData alloc] init];
 
-                // Emit a URL that opens the cordova app
-                NSString *url = [NSString stringWithFormat:@"%@://image", SHAREEXT_URL_SCHEME];
+                    UIImage *sharedImage = nil;
+                    if ([(NSObject*)item isKindOfClass:[NSURL class]]) {
+                        sharedImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:(NSURL*)item]];
+                    }
+                    if ([(NSObject*)item isKindOfClass:[UIImage class]]) {
+                        sharedImage = (UIImage*)item;
+                    }
 
-                // Not allowed:
-                // [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
+                    data = UIImagePNGRepresentation((UIImage*)sharedImage);
 
-                // Crashes:
-                // [self.extensionContext openURL:[NSURL URLWithString:url] completionHandler:nil];
+                    NSString * suggestedName;
+                    NSString * uti;
+                    NSArray<NSString *> * utis;
 
-                // From https://stackoverflow.com/a/25750229/2343390
-                // Reported not to work since iOS 8.3
-                // NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
-                // [self.webView loadRequest:request];
+                    [self setParameters:fileIdentifier itemProvider:itemProvider suggestedName:&suggestedName uti:&uti utis:&utis];
 
-                [self openURL:[NSURL URLWithString:url]];
+                    NSDictionary *dict = @{
+                        @"backURL": self.backURL,
+                        @"data" : data,
+                        @"uti": uti,
+                        @"utis": utis,
+                        @"name": suggestedName
+                    };
 
-                // Inform the host that we're done, so it un-blocks its UI.
-                [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
-            }];
+                    [self.userDefaults setObject:dict forKey:@"image"];
+                    [self.userDefaults synchronize];
 
-            return;
+                    // Emit a URL that opens the cordova app
+                    NSString *redirectUrl = [NSString stringWithFormat:@"%@://image", SHAREEXT_URL_SCHEME];
+
+                    [self openURL:[NSURL URLWithString:redirectUrl]];
+
+                    // Inform the host that we're done, so it un-blocks its UI.
+                    [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
+                }];
+            }
+
+        } else if ([fileIdentifier isEqualToString: @"public.url"]) {
+
+            NSExtensionItem *item = self.extensionContext.inputItems.firstObject;
+            NSItemProvider *itemProvider = item.attachments.firstObject;
+
+            if ([itemProvider hasItemConformingToTypeIdentifier:fileIdentifier]) {
+                [itemProvider loadItemForTypeIdentifier:fileIdentifier options:nil completionHandler:^(NSURL *url, NSError *error) {
+                    NSString *urlString = url.absoluteString;
+
+                    NSString * suggestedName;
+                    NSString * uti;
+                    NSArray<NSString *> * utis;
+
+                    [self setParameters:fileIdentifier itemProvider:itemProvider suggestedName:&suggestedName uti:&uti utis:&utis];
+
+                    NSDictionary *dict = @{
+                         @"backURL": self.backURL,
+                         @"data" : urlString,
+                         @"uti": uti,
+                         @"utis": utis,
+                         @"name": suggestedName
+                    };
+
+                    [self.userDefaults setObject:dict forKey:@"url"];
+                    [self.userDefaults synchronize];
+
+                    // Emit a URL that opens the cordova app
+                    NSString *redirectUrl = [NSString stringWithFormat:@"%@://url", SHAREEXT_URL_SCHEME];
+
+                    [self openURL:[NSURL URLWithString:redirectUrl]];
+
+                    // Inform the host that we're done, so it un-blocks its UI.
+                    [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
+                }];
+            }
+
+        } else if ([fileIdentifier isEqualToString: @"public.plain-text"]) {
+
+            NSExtensionItem *item = self.extensionContext.inputItems.firstObject;
+            NSItemProvider *itemProvider = item.attachments.firstObject;
+
+            if ([itemProvider hasItemConformingToTypeIdentifier:fileIdentifier]) {
+                [itemProvider loadItemForTypeIdentifier:fileIdentifier options:nil completionHandler:^(id<NSSecureCoding, NSObject> item, NSError *error) {
+
+                    NSString *text = (NSString*)item;
+                    NSLog(@"Text %@", text);
+
+                    NSString * suggestedName;
+                    NSString * uti;
+                    NSArray<NSString *> * utis;
+
+                    [self setParameters:fileIdentifier itemProvider:itemProvider suggestedName:&suggestedName uti:&uti utis:&utis];
+
+                    NSDictionary *dict = @{
+                        @"backURL": self.backURL,
+                        @"data" : text,
+                        @"uti": uti,
+                        @"utis": utis,
+                        @"name": suggestedName
+                    };
+
+                    [self.userDefaults setObject:dict forKey:@"text"];
+                    [self.userDefaults synchronize];
+
+                    // Emit a URL that opens the cordova app
+                    NSString *redirectUrl = [NSString stringWithFormat:@"%@://text", SHAREEXT_URL_SCHEME];
+
+                    [self openURL:[NSURL URLWithString:redirectUrl]];
+
+                    // Inform the host that we're done, so it un-blocks its UI.
+                    [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
+
+                }];
+            }
+        } else {
+          // Get itemProvider type
+          UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"File type not supported"
+                                                                         message:@"We only accept images, links and text."
+                                                                  preferredStyle:UIAlertControllerStyleAlert];
+
+          UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction * action) {}];
+
+          [alert addAction:defaultAction];
+          [self presentViewController:alert animated:YES completion:nil];
         }
     }
-
-    // Inform the host that we're done, so it un-blocks its UI.
-    [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
+    return;
 }
 
 - (NSArray*) configurationItems {
